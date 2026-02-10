@@ -96,10 +96,16 @@ const App: React.FC = () => {
               <Logo className="scale-75" />
               <span className="font-black text-xl tracking-tighter text-gray-900 ml-1">우리는 청소년부</span>
             </Link>
-            <div className="flex items-center space-x-2">
-               <span className="text-[10px] font-black bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full border border-indigo-100">
-                {currentUser.name}
-              </span>
+            <div className="flex items-center space-x-3">
+              <div className="hidden sm:block text-right">
+                <p className="text-[10px] text-gray-400 font-bold leading-none mb-1">안녕하세요,</p>
+                <p className="text-xs font-black text-gray-900 leading-none">
+                  <span className="text-indigo-600">{currentUser.name} {currentUser.role === 'student' ? '학생' : '선생님'}</span>님!
+                </p>
+              </div>
+              <div className="sm:hidden text-[10px] font-black bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full border border-indigo-100">
+                {currentUser.name} {currentUser.role === 'student' ? '학생' : '선생님'}
+              </div>
               <button onClick={handleLogout} className="p-2.5 text-gray-300 hover:text-red-500 active:bg-red-50 rounded-2xl transition-all">
                 <LogOut className="w-5 h-5" />
               </button>
@@ -139,7 +145,6 @@ const NavLink = ({ to, icon, label }: { to: string, icon: React.ReactElement, la
   return (
     <Link to={to} className={`flex flex-col items-center space-y-1 transition-all active:scale-90 ${isActive ? 'text-indigo-600' : 'text-gray-300'}`}>
       <div className={`p-1.5 rounded-xl ${isActive ? 'bg-indigo-50' : ''}`}>
-        {/* Fix: Cast properties to any to bypass strict type checking for cloneElement with Lucide icons */}
         {React.cloneElement(icon, { className: "w-6 h-6" } as any)}
       </div>
       <span className={`text-[10px] font-black ${isActive ? 'text-indigo-600' : 'text-gray-400'}`}>{label}</span>
