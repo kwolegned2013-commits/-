@@ -260,7 +260,7 @@ const AdminPage: React.FC<AdminPageProps> = ({
       {/* Notice Modal */}
       {isEditingNotice && (
         <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-6 backdrop-blur-md">
-          <div className="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+          <div className="bg-white w-full max-md rounded-3xl p-8 shadow-2xl">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-black text-gray-900">공지 작성/수정</h2>
               <button onClick={() => setIsEditingNotice(false)} className="text-gray-300 hover:text-gray-600"><X className="w-7 h-7" /></button>
@@ -313,7 +313,8 @@ const AdminTabBtn: React.FC<{ active: boolean, onClick: () => void, icon: React.
 const StatsCard: React.FC<{ icon: React.ReactNode, bg: string, label: string, value: string }> = ({ icon, bg, label, value }) => (
   <div className="bg-white p-6 rounded-3xl border border-gray-50 shadow-sm flex flex-col items-center">
     <div className={`${bg} w-14 h-14 rounded-2xl flex items-center justify-center mb-3`}>
-      {React.cloneElement(icon as React.ReactElement, { className: 'w-7 h-7' })}
+      {/* Fix: Cast properties to any to bypass strict type checking for cloneElement with Lucide icons */}
+      {React.cloneElement(icon as React.ReactElement, { className: 'w-7 h-7' } as any)}
     </div>
     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{label}</p>
     <p className="text-2xl font-black text-gray-900">{value}</p>

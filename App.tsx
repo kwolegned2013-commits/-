@@ -139,7 +139,8 @@ const NavLink = ({ to, icon, label }: { to: string, icon: React.ReactElement, la
   return (
     <Link to={to} className={`flex flex-col items-center space-y-1 transition-all active:scale-90 ${isActive ? 'text-indigo-600' : 'text-gray-300'}`}>
       <div className={`p-1.5 rounded-xl ${isActive ? 'bg-indigo-50' : ''}`}>
-        {React.cloneElement(icon, { className: "w-6 h-6" })}
+        {/* Fix: Cast properties to any to bypass strict type checking for cloneElement with Lucide icons */}
+        {React.cloneElement(icon, { className: "w-6 h-6" } as any)}
       </div>
       <span className={`text-[10px] font-black ${isActive ? 'text-indigo-600' : 'text-gray-400'}`}>{label}</span>
     </Link>
