@@ -1,7 +1,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import App from './App.tsx';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -15,10 +15,10 @@ root.render(
   </React.StrictMode>
 );
 
-// PWA 서비스 워커 등록
+// PWA 서비스 워커 등록 (상대 경로 사용)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(
+    navigator.serviceWorker.register('./sw.js').then(
       (registration) => {
         console.log('SW registered: ', registration);
       },

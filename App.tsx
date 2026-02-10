@@ -84,6 +84,11 @@ const App: React.FC = () => {
     localStorage.removeItem('we_youth_user');
   };
 
+  const getRoleLabel = (role: string) => {
+    if (role === 'student') return '학생';
+    return '선생님';
+  };
+
   if (showSplash) return <SplashScreen />;
   if (!currentUser) return <LoginPage onLogin={handleLogin} />;
 
@@ -98,13 +103,12 @@ const App: React.FC = () => {
             </Link>
             <div className="flex items-center space-x-3">
               <div className="hidden sm:block text-right">
-                <p className="text-[10px] text-gray-400 font-bold leading-none mb-1">안녕하세요,</p>
-                <p className="text-xs font-black text-gray-900 leading-none">
-                  <span className="text-indigo-600">{currentUser.name} {currentUser.role === 'student' ? '학생' : '선생님'}</span>님!
+                <p className="text-sm font-black text-gray-900">
+                  안녕하세요, <span className="text-indigo-600">{currentUser.name} {getRoleLabel(currentUser.role)}</span>
                 </p>
               </div>
-              <div className="sm:hidden text-[10px] font-black bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full border border-indigo-100">
-                {currentUser.name} {currentUser.role === 'student' ? '학생' : '선생님'}
+              <div className="sm:hidden text-xs font-black bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full border border-indigo-100">
+                {currentUser.name} {getRoleLabel(currentUser.role)}
               </div>
               <button onClick={handleLogout} className="p-2.5 text-gray-300 hover:text-red-500 active:bg-red-50 rounded-2xl transition-all">
                 <LogOut className="w-5 h-5" />
@@ -123,6 +127,7 @@ const App: React.FC = () => {
               <Route path="/attendance" element={<AttendancePage user={currentUser} />} />
               <Route path="/qt" element={<QTPage user={currentUser} />} />
               <Route path="/admin" element={currentUser.role !== 'student' ? <AdminPage user={currentUser} notices={notices} setNotices={setNotices} schedules={schedules} setSchedules={setSchedules} worshipInfo={{time: "10:30", location: "지하 1층"}} setWorshipInfo={() => {}} /> : <Navigate to="/" />} />
+              <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>
         </main>
