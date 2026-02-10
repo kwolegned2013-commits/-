@@ -1,23 +1,31 @@
 
 {
-  "name": "우리는 청소년부",
+  "name": "우리는 청소년부 (WE Youth)",
   "short_name": "WE Youth",
   "description": "서로 소통하고 함께 성장하는 우리는 청소년부 공식 앱",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#111827",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
   "icons": [
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=111827",
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=4f46e5",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=111827",
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=4f46e5",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=4f46e5",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
