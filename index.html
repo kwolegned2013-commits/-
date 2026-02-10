@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="WE Youth">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#4f46e5"> <!-- Indigo 600 -->
+    <meta name="theme-color" content="#4f46e5">
     
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=4f46e5">
@@ -26,14 +26,11 @@
           user-select: none;
           overscroll-behavior-y: contain;
           background-color: #f9fafb;
-          /* iOS safe area inset */
           padding-bottom: env(safe-area-inset-bottom);
         }
         input, textarea { user-select: text; }
-        
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
         .page-enter {
           animation: slideUp 0.4s ease-out forwards;
         }
@@ -41,8 +38,6 @@
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-
-        /* PWA 스탠드얼론 모드에서 하단 여백 조정 */
         @media (display-mode: standalone) {
           .pb-24 { padding-bottom: 6rem; }
         }
@@ -65,5 +60,7 @@
 </head>
 <body class="bg-gray-50 text-gray-900">
     <div id="root"></div>
+    <!-- 앱을 실행하기 위한 메인 진입점 스크립트를 명시적으로 추가합니다. -->
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>

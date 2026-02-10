@@ -4,6 +4,7 @@
   "short_name": "WE Youth",
   "description": "서로 소통하고 함께 성장하는 우리는 청소년부 공식 앱",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",

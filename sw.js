@@ -1,12 +1,11 @@
 
-const CACHE_NAME = 'we-youth-v1';
+const CACHE_NAME = 'we-youth-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json'
 ];
 
-// 서비스 워커 설치 및 리소스 캐싱
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -16,7 +15,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// 활성화 시 오래된 캐시 정리
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -32,11 +30,27 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// 네트워크 요청 가로채기 (캐시 우선 전략)
+// 수정된 Fetch 전략: 네트워크 우선 (Network First)
 self.addEventListener('fetch', (event) => {
+  // POST 요청이나 외부 API 요청은 캐싱하지 않음
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then((response) => {
+        // 네트워크 성공 시 해당 응답을 캐시에 저장 (선택 사항)
+        const resClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          // 내부 리소스만 캐싱 (보안 및 안정성)
+          if (event.request.url.startsWith(self.location.origin)) {
+            cache.put(event.request, resClone);
+          }
+        });
+        return response;
+      })
+      .catch(() => {
+        // 네트워크 실패(오프라인) 시 캐시에서 확인
+        return caches.match(event.request);
+      })
   );
 });
