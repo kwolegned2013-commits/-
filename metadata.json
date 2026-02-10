@@ -1,0 +1,7 @@
+{
+  "name": "우리는 청소년부 App",
+  "description": "우리는 청소년부(WE Youth)를 위한 종합 커뮤니티 및 관리 플랫폼입니다. AI 묵상, 출석 체크, 커뮤니티 기능을 제공합니다.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
