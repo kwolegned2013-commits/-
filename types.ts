@@ -13,6 +13,14 @@ export interface Notice {
   date: string;
   author: string;
   category: 'worship' | 'event' | 'info';
+  imageUrl?: string;
+}
+
+export interface Comment {
+  id: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
 }
 
 export interface Post {
@@ -24,6 +32,7 @@ export interface Post {
   category: 'talk' | 'prayer';
   createdAt: string;
   likes: number;
+  comments: Comment[];
 }
 
 export interface AttendanceRecord {

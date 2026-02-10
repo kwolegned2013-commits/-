@@ -30,7 +30,9 @@ export const INITIAL_POSTS: Post[] = [
     authorName: '이수진',
     category: 'prayer',
     createdAt: '2024-07-26T08:30:00Z',
-    likes: 12
+    likes: 12,
+    // Fix: Add missing comments property required by Post type
+    comments: []
   },
   {
     id: '102',
@@ -40,7 +42,9 @@ export const INITIAL_POSTS: Post[] = [
     authorName: '최민수',
     category: 'talk',
     createdAt: '2024-07-26T12:00:00Z',
-    likes: 5
+    likes: 5,
+    // Fix: Add missing comments property required by Post type
+    comments: []
   }
 ];
 
