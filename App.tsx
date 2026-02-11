@@ -69,17 +69,18 @@ const App: React.FC = () => {
   const [schedules, setSchedules] = useState(getInitialSchedule);
 
   useEffect(() => {
-    // 초기 HTML 로더 제거
-    const loader = document.getElementById('initial-loader');
-    if (loader) {
-      loader.style.opacity = '0';
+    // 1. 최우선적으로 HTML의 initial-loader 제거
+    const initialLoader = document.getElementById('initial-loader');
+    if (initialLoader) {
+      initialLoader.style.opacity = '0';
       setTimeout(() => {
-        if (loader.parentNode) loader.remove();
-      }, 500);
+        if (initialLoader.parentNode) initialLoader.remove();
+      }, 400);
     }
 
-    const exitTimer = setTimeout(() => setIsSplashExiting(true), 1500);
-    const removeTimer = setTimeout(() => setShowSplash(false), 2200);
+    // 2. 앱 내 SplashScreen 전환 로직
+    const exitTimer = setTimeout(() => setIsSplashExiting(true), 1200);
+    const removeTimer = setTimeout(() => setShowSplash(false), 1900);
     
     return () => {
       clearTimeout(exitTimer);
