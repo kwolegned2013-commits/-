@@ -2,16 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Home, MessageSquare, Calendar, UserCheck, Settings, BookOpen, Bell, LogOut, Sparkles } from 'lucide-react';
-import { User, Notice, Post } from './types';
-import { INITIAL_NOTICES, INITIAL_POSTS } from './constants';
-import HomePage from './pages/HomePage';
-import CommunityPage from './pages/CommunityPage';
-import QTPage from './pages/QTPage';
-import AttendancePage from './pages/AttendancePage';
-import AdminPage from './pages/AdminPage';
-import LoginPage from './pages/LoginPage';
-import NoticeDetailPage from './pages/NoticeDetailPage';
-import PostDetailPage from './pages/PostDetailPage';
+import { User, Notice, Post } from './types.ts';
+import { INITIAL_NOTICES, INITIAL_POSTS } from './constants.tsx';
+import HomePage from './pages/HomePage.tsx';
+import CommunityPage from './pages/CommunityPage.tsx';
+import QTPage from './pages/QTPage.tsx';
+import AttendancePage from './pages/AttendancePage.tsx';
+import AdminPage from './pages/AdminPage.tsx';
+import LoginPage from './pages/LoginPage.tsx';
+import NoticeDetailPage from './pages/NoticeDetailPage.tsx';
+import PostDetailPage from './pages/PostDetailPage.tsx';
 
 const getInitialNotices = () => {
   const saved = localStorage.getItem('we_youth_notices');
@@ -69,7 +69,7 @@ const App: React.FC = () => {
   const [schedules, setSchedules] = useState(getInitialSchedule);
 
   useEffect(() => {
-    // 초기 로딩 스크린 제거 (HTML에 있던 것)
+    // 초기 HTML 로더 제거
     const loader = document.getElementById('initial-loader');
     if (loader) {
       loader.style.opacity = '0';
