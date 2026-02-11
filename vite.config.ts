@@ -12,7 +12,8 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     assetsDir: 'assets',
-    minify: 'terser',
+    // 'terser' 대신 더 빠르고 기본 내장된 'esbuild'를 사용합니다.
+    minify: 'esbuild',
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
