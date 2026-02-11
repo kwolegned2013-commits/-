@@ -7,8 +7,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#4f46e5",
+  "background_color": "#111827",
+  "theme_color": "#111827",
   "icons": [
     {
       "src": "https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=4f46e5",

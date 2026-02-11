@@ -45,18 +45,20 @@ const Logo = ({ className = "", inverted = false }) => (
   </div>
 );
 
-const SplashScreen = () => (
-  <div className="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-[999]">
+const SplashScreen = ({ isExiting }: { isExiting: boolean }) => (
+  <div className={`fixed inset-0 bg-gray-950 flex flex-col items-center justify-center z-[999] transition-opacity duration-700 ${isExiting ? 'opacity-0' : 'opacity-100'}`}>
     <Logo inverted className="mb-6 scale-125" />
     <div className="flex items-center space-x-2 text-indigo-400 font-bold tracking-widest text-sm animate-pulse">
       <Sparkles className="w-4 h-4" />
       <span>WE YOUTH</span>
     </div>
+    <p className="absolute bottom-12 text-gray-600 text-[10px] font-black tracking-[0.2em]">LOADING SPIRITUAL SPACE</p>
   </div>
 );
 
 const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const [isSplashExiting, setIsSplashExiting] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('we_youth_user');
     return saved ? JSON.parse(saved) : null;
@@ -67,8 +69,20 @@ const App: React.FC = () => {
   const [schedules, setSchedules] = useState(getInitialSchedule);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 1800);
-    return () => clearTimeout(timer);
+    // 초기 로딩 스크린 제거 (HTML에 있던 것)
+    const loader = document.getElementById('initial-loader');
+    if (loader) {
+      loader.style.opacity = '0';
+      setTimeout(() => loader.remove(), 500);
+    }
+
+    const exitTimer = setTimeout(() => setIsSplashExiting(true), 1500);
+    const removeTimer = setTimeout(() => setShowSplash(false), 2200);
+    
+    return () => {
+      clearTimeout(exitTimer);
+      clearTimeout(removeTimer);
+    };
   }, []);
 
   useEffect(() => { localStorage.setItem('we_youth_notices', JSON.stringify(notices)); }, [notices]);
@@ -86,59 +100,65 @@ const App: React.FC = () => {
 
   const getRoleLabel = (role: string) => {
     if (role === 'student') return '학생';
+    if (role === 'admin') return '전도사님';
     return '선생님';
   };
-
-  if (showSplash) return <SplashScreen />;
-  if (!currentUser) return <LoginPage onLogin={handleLogin} />;
 
   return (
     <HashRouter>
       <div className="min-h-screen bg-gray-50 flex flex-col overflow-x-hidden pb-24">
-        <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-4 pt-safe shadow-sm">
-          <div className="max-w-4xl mx-auto h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2 active:scale-95 transition-transform">
-              <Logo className="scale-75" />
-              <span className="font-black text-xl tracking-tighter text-gray-900 ml-1">우리는 청소년부</span>
-            </Link>
-            <div className="flex items-center space-x-3">
-              <div className="hidden sm:block text-right">
-                <p className="text-sm font-black text-gray-900">
-                  안녕하세요, <span className="text-indigo-600">{currentUser.name} {getRoleLabel(currentUser.role)}</span>
-                </p>
-              </div>
-              <div className="sm:hidden text-xs font-black bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full border border-indigo-100">
-                {currentUser.name} {getRoleLabel(currentUser.role)}
-              </div>
-              <button onClick={handleLogout} className="p-2.5 text-gray-300 hover:text-red-500 active:bg-red-50 rounded-2xl transition-all">
-                <LogOut className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </header>
+        {showSplash && <SplashScreen isExiting={isSplashExiting} />}
+        
+        {!showSplash && !currentUser && <LoginPage onLogin={handleLogin} />}
 
-        <main className="flex-1 max-w-4xl w-full mx-auto p-4">
-          <div className="page-enter">
-            <Routes>
-              <Route path="/" element={<HomePage user={currentUser} notices={notices} schedules={schedules} />} />
-              <Route path="/notice/:id" element={<NoticeDetailPage notices={notices} />} />
-              <Route path="/community" element={<CommunityPage user={currentUser} posts={posts} setPosts={setPosts} />} />
-              <Route path="/post/:id" element={<PostDetailPage user={currentUser} posts={posts} setPosts={setPosts} />} />
-              <Route path="/attendance" element={<AttendancePage user={currentUser} />} />
-              <Route path="/qt" element={<QTPage user={currentUser} />} />
-              <Route path="/admin" element={currentUser.role !== 'student' ? <AdminPage user={currentUser} notices={notices} setNotices={setNotices} schedules={schedules} setSchedules={setSchedules} worshipInfo={{time: "10:30", location: "지하 1층"}} setWorshipInfo={() => {}} /> : <Navigate to="/" />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </div>
-        </main>
+        {!showSplash && currentUser && (
+          <>
+            <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-4 pt-safe shadow-sm">
+              <div className="max-w-4xl mx-auto h-16 flex items-center justify-between">
+                <Link to="/" className="flex items-center space-x-2 active:scale-95 transition-transform">
+                  <Logo className="scale-75" />
+                  <span className="font-black text-xl tracking-tighter text-gray-900 ml-1">우리는 청소년부</span>
+                </Link>
+                <div className="flex items-center space-x-3">
+                  <div className="hidden sm:block text-right">
+                    <p className="text-sm font-black text-gray-900">
+                      안녕하세요, <span className="text-indigo-600">{currentUser.name} {getRoleLabel(currentUser.role)}</span>
+                    </p>
+                  </div>
+                  <div className="sm:hidden text-xs font-black bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full border border-indigo-100">
+                    {currentUser.name} {getRoleLabel(currentUser.role)}
+                  </div>
+                  <button onClick={handleLogout} className="p-2.5 text-gray-300 hover:text-red-500 active:bg-red-50 rounded-2xl transition-all">
+                    <LogOut className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </header>
 
-        <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-6 pt-3 pb-8 flex justify-between items-center md:hidden z-50 shadow-[0_-1px_15px_rgba(0,0,0,0.03)]">
-          <NavLink to="/" icon={<Home />} label="홈" />
-          <NavLink to="/community" icon={<MessageSquare />} label="소통" />
-          <NavLink to="/attendance" icon={<UserCheck />} label="출석" />
-          <NavLink to="/qt" icon={<BookOpen />} label="묵상" />
-          {currentUser.role !== 'student' && <NavLink to="/admin" icon={<Settings />} label="관리" />}
-        </nav>
+            <main className="flex-1 max-w-4xl w-full mx-auto p-4">
+              <div className="page-enter">
+                <Routes>
+                  <Route path="/" element={<HomePage user={currentUser} notices={notices} schedules={schedules} />} />
+                  <Route path="/notice/:id" element={<NoticeDetailPage notices={notices} />} />
+                  <Route path="/community" element={<CommunityPage user={currentUser} posts={posts} setPosts={setPosts} />} />
+                  <Route path="/post/:id" element={<PostDetailPage user={currentUser} posts={posts} setPosts={setPosts} />} />
+                  <Route path="/attendance" element={<AttendancePage user={currentUser} />} />
+                  <Route path="/qt" element={<QTPage user={currentUser} />} />
+                  <Route path="/admin" element={currentUser.role !== 'student' ? <AdminPage user={currentUser} notices={notices} setNotices={setNotices} schedules={schedules} setSchedules={setSchedules} worshipInfo={{time: "10:30", location: "지하 1층"}} setWorshipInfo={() => {}} /> : <Navigate to="/" />} />
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+              </div>
+            </main>
+
+            <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-6 pt-3 pb-8 flex justify-between items-center md:hidden z-50 shadow-[0_-1px_15px_rgba(0,0,0,0.03)]">
+              <NavLink to="/" icon={<Home />} label="홈" />
+              <NavLink to="/community" icon={<MessageSquare />} label="소통" />
+              <NavLink to="/attendance" icon={<UserCheck />} label="출석" />
+              <NavLink to="/qt" icon={<BookOpen />} label="묵상" />
+              {currentUser.role !== 'student' && <NavLink to="/admin" icon={<Settings />} label="관리" />}
+            </nav>
+          </>
+        )}
       </div>
     </HashRouter>
   );

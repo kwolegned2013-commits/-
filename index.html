@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="WE Youth">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#4f46e5">
+    <meta name="theme-color" content="#111827">
     
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=4f46e5">
@@ -33,10 +33,44 @@
           overscroll-behavior-y: contain;
           background-color: #f9fafb;
           padding-bottom: env(safe-area-inset-bottom);
+          margin: 0;
         }
         input, textarea { user-select: text; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Initial Loading Screen Styles */
+        #initial-loader {
+          position: fixed;
+          inset: 0;
+          background-color: #111827;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          transition: opacity 0.5s ease-out;
+        }
+        .loader-logo {
+          color: white;
+          font-size: 3rem;
+          font-weight: 900;
+          letter-spacing: -0.05em;
+          margin-bottom: 1rem;
+        }
+        .loader-bar {
+          width: 40px;
+          height: 3px;
+          background: #4f46e5;
+          border-radius: 10px;
+          animation: loading 1.5s infinite ease-in-out;
+        }
+        @keyframes loading {
+          0% { transform: scaleX(0.5); opacity: 0.3; }
+          50% { transform: scaleX(1.5); opacity: 1; }
+          100% { transform: scaleX(0.5); opacity: 0.3; }
+        }
+
         .page-enter {
           animation: slideUp 0.4s ease-out forwards;
         }
@@ -65,7 +99,13 @@
 </script>
 </head>
 <body class="bg-gray-50 text-gray-900">
-    <div id="root"></div>
+    <div id="root">
+        <!-- 자바스크립트 로드 전에 보여질 화면 -->
+        <div id="initial-loader">
+            <div class="loader-logo">WE</div>
+            <div class="loader-bar"></div>
+        </div>
+    </div>
     <script type="module" src="./index.tsx"></script>
 </body>
 </html>

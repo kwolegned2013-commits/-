@@ -67,7 +67,7 @@ const AdminPage: React.FC<AdminPageProps> = ({
   const handleGlobalSave = () => {
     setWorshipInfo(localWorshipInfo);
     setSchedules(localSchedules);
-    showStatus("모든 정보가 마스터 서버에 저장되었습니다!");
+    showStatus("모든 정보가 서버에 저장되었습니다!");
   };
 
   const addScheduleItem = () => {
@@ -92,8 +92,8 @@ const AdminPage: React.FC<AdminPageProps> = ({
         <div className="flex items-center space-x-2">
           <h1 className="text-2xl font-black tracking-tight text-gray-900">관리자 센터</h1>
           {isMasterAdmin && (
-            <span className="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black flex items-center shadow-sm">
-              <ShieldCheck className="w-3 h-3 mr-1" /> MASTER
+            <span className="bg-amber-500 text-white text-[10px] px-3 py-1 rounded-full font-black flex items-center shadow-sm">
+              <ShieldCheck className="w-3 h-3 mr-1" /> 전도사님
             </span>
           )}
         </div>
@@ -313,7 +313,6 @@ const AdminTabBtn: React.FC<{ active: boolean, onClick: () => void, icon: React.
 const StatsCard: React.FC<{ icon: React.ReactNode, bg: string, label: string, value: string }> = ({ icon, bg, label, value }) => (
   <div className="bg-white p-6 rounded-3xl border border-gray-50 shadow-sm flex flex-col items-center">
     <div className={`${bg} w-14 h-14 rounded-2xl flex items-center justify-center mb-3`}>
-      {/* Fix: Cast properties to any to bypass strict type checking for cloneElement with Lucide icons */}
       {React.cloneElement(icon as React.ReactElement, { className: 'w-7 h-7' } as any)}
     </div>
     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{label}</p>
