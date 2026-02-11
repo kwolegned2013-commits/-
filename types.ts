@@ -16,6 +16,27 @@ export interface Notice {
   imageUrl?: string;
 }
 
+export interface AppNotification {
+  id: string;
+  type: 'notice' | 'community';
+  title: string;
+  message: string;
+  link: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export interface Participation {
+  id: string;
+  noticeId: string;
+  noticeTitle: string;
+  userId: string;
+  userName: string;
+  userRole: string;
+  appliedAt: string;
+  isRead: boolean;
+}
+
 export interface Comment {
   id: string;
   authorName: string;

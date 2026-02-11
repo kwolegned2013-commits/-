@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { Home, MessageSquare, Calendar, UserCheck, Settings, BookOpen, Bell, LogOut, Sparkles, Music, Users } from 'lucide-react';
-import { User, Notice, Post } from './types';
+import { Home, MessageSquare, Calendar, UserCheck, Settings, BookOpen, Bell, LogOut, Sparkles, Music, Users, ClipboardCheck } from 'lucide-react';
+import { User, Notice, Post, Participation, AttendanceRecord, AppNotification } from './types';
 import { INITIAL_NOTICES, INITIAL_POSTS } from './constants';
 import HomePage from './pages/HomePage';
 import CommunityPage from './pages/CommunityPage';
@@ -11,7 +11,9 @@ import AttendancePage from './pages/AttendancePage';
 import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
 import NoticeDetailPage from './pages/NoticeDetailPage';
+import NoticesPage from './pages/NoticesPage';
 import PostDetailPage from './pages/PostDetailPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 const getInitialNotices = () => {
   const saved = localStorage.getItem('we_youth_notices');
@@ -23,12 +25,27 @@ const getInitialPosts = () => {
   return saved ? JSON.parse(saved) : INITIAL_POSTS;
 };
 
+const getInitialNotifications = (): AppNotification[] => {
+  const saved = localStorage.getItem('we_youth_notifications');
+  return saved ? JSON.parse(saved) : [];
+};
+
+const getInitialParticipations = (): Participation[] => {
+  const saved = localStorage.getItem('we_youth_participations');
+  return saved ? JSON.parse(saved) : [];
+};
+
+const getInitialAttendance = (): AttendanceRecord[] => {
+  const saved = localStorage.getItem('we_youth_attendance');
+  return saved ? JSON.parse(saved) : [];
+};
+
 const getInitialSchedule = () => {
   const saved = localStorage.getItem('we_youth_schedule');
   return saved ? JSON.parse(saved) : [
-    { day: "월", title: "고등부 찬양팀 연습", time: "19:00", type: "practice" },
-    { day: "목", title: "중등부 소그룹 모임", time: "18:30", type: "meeting" },
-    { day: "주일", title: "주일 대예배 & 분반공부", time: "10:30", isMain: true, type: "worship" }
+    { day: "월", title: "찬양팀 연습", time: "19:00", type: "practice" },
+    { day: "목", title: "소그룹 모임", time: "18:30", type: "meeting" },
+    { day: "주일", title: "주일 예배 & 분반공부", time: "10:30", isMain: true, type: "worship" }
   ];
 };
 
@@ -57,10 +74,12 @@ export const Logo = ({ className = "", inverted = false }) => (
 
 const SplashScreen = ({ isExiting }: { isExiting: boolean }) => (
   <div className={`fixed inset-0 bg-gray-950 flex flex-col items-center justify-center z-[999] transition-opacity duration-700 ${isExiting ? 'opacity-0' : 'opacity-100'}`}>
-    <Logo inverted className="mb-8 scale-150" />
-    <div className="flex items-center space-x-2 text-indigo-400 font-bold tracking-widest text-sm animate-pulse">
-      <Sparkles className="w-4 h-4" />
-      <span>WE YOUTH</span>
+    <div className="flex flex-col items-center">
+      <Logo inverted className="mb-8 scale-150" />
+      <div className="flex items-center space-x-2 text-indigo-400 font-bold tracking-widest text-sm animate-pulse">
+        <Sparkles className="w-4 h-4" />
+        <span>WE YOUTH</span>
+      </div>
     </div>
     <p className="absolute bottom-12 text-gray-600 text-[10px] font-black tracking-[0.2em]">LOADING SPIRITUAL SPACE</p>
   </div>
@@ -76,6 +95,9 @@ const App: React.FC = () => {
 
   const [notices, setNotices] = useState<Notice[]>(getInitialNotices);
   const [posts, setPosts] = useState<Post[]>(getInitialPosts);
+  const [notifications, setNotifications] = useState<AppNotification[]>(getInitialNotifications);
+  const [participations, setParticipations] = useState<Participation[]>(getInitialParticipations);
+  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(getInitialAttendance);
   const [schedules, setSchedules] = useState(getInitialSchedule);
   const [verifiedUsers, setVerifiedUsers] = useState<{name: string, role: string}[]>(getInitialVerifiedUsers);
 
@@ -90,9 +112,26 @@ const App: React.FC = () => {
     return () => { clearTimeout(exitTimer); clearTimeout(removeTimer); };
   }, []);
 
+  // 모든 상태 변화를 로컬 스토리지에 즉시 동기화
   useEffect(() => { localStorage.setItem('we_youth_notices', JSON.stringify(notices)); }, [notices]);
   useEffect(() => { localStorage.setItem('we_youth_posts', JSON.stringify(posts)); }, [posts]);
+  useEffect(() => { localStorage.setItem('we_youth_notifications', JSON.stringify(notifications)); }, [notifications]);
+  useEffect(() => { localStorage.setItem('we_youth_participations', JSON.stringify(participations)); }, [participations]);
+  useEffect(() => { localStorage.setItem('we_youth_attendance', JSON.stringify(attendanceRecords)); }, [attendanceRecords]);
   useEffect(() => { localStorage.setItem('we_youth_verified_users', JSON.stringify(verifiedUsers)); }, [verifiedUsers]);
+  useEffect(() => { localStorage.setItem('we_youth_schedule', JSON.stringify(schedules)); }, [schedules]);
+
+  // 실시간 직위 변경 반영 로직
+  useEffect(() => {
+    if (currentUser) {
+      const matchedUser = verifiedUsers.find(u => u.name === currentUser.name);
+      if (matchedUser && matchedUser.role !== currentUser.role) {
+        const updatedUser = { ...currentUser, role: matchedUser.role as any };
+        setCurrentUser(updatedUser);
+        localStorage.setItem('we_youth_user', JSON.stringify(updatedUser));
+      }
+    }
+  }, [verifiedUsers, currentUser]);
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
@@ -120,6 +159,10 @@ const App: React.FC = () => {
     return 'bg-emerald-600 text-white ring-4 ring-emerald-100';
   };
 
+  const unreadNotiCount = notifications.filter(n => !n.isRead).length;
+  // 김우신 님은 학생 신분이어도 관리자 페이지에 접근 가능
+  const canAccessAdmin = currentUser && (currentUser.role !== 'student' || currentUser.name === '김우신');
+
   return (
     <HashRouter>
       <div className="min-h-screen bg-gray-50 flex flex-col overflow-x-hidden pb-24">
@@ -135,8 +178,16 @@ const App: React.FC = () => {
                   <Logo className="scale-[0.6] origin-left" />
                   <span className="font-black text-lg tracking-tighter text-gray-900 ml-[-5px]">우리는 청소년부</span>
                 </Link>
-                <div className="flex items-center space-x-3">
-                  <div className={`px-4 py-1.5 rounded-full text-[11px] font-black shadow-sm ${getRoleColorStyles(currentUser.role)}`}>
+                <div className="flex items-center space-x-2">
+                  <Link to="/notifications" className="relative p-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                    <Bell className="w-5 h-5" />
+                    {unreadNotiCount > 0 && (
+                      <span className="absolute top-1 right-1 bg-rose-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white animate-bounce">
+                        {unreadNotiCount > 9 ? 'N' : unreadNotiCount}
+                      </span>
+                    )}
+                  </Link>
+                  <div className={`px-4 py-1.5 rounded-full text-[11px] font-black shadow-sm animate-in zoom-in duration-300 ${getRoleColorStyles(currentUser.role)}`}>
                     {currentUser.name} {getRoleLabel(currentUser.role)}
                   </div>
                   <button onClick={handleLogout} className="p-2 text-gray-300 hover:text-red-500 transition-colors">
@@ -150,12 +201,14 @@ const App: React.FC = () => {
               <div className="page-enter">
                 <Routes>
                   <Route path="/" element={<HomePage user={currentUser} notices={notices} schedules={schedules} />} />
-                  <Route path="/notice/:id" element={<NoticeDetailPage notices={notices} />} />
-                  <Route path="/community" element={<CommunityPage user={currentUser} posts={posts} setPosts={setPosts} />} />
+                  <Route path="/notices" element={<NoticesPage notices={notices} />} />
+                  <Route path="/notifications" element={<NotificationsPage notifications={notifications} setNotifications={setNotifications} />} />
+                  <Route path="/notice/:id" element={<NoticeDetailPage user={currentUser} notices={notices} participations={participations} setParticipations={setParticipations} />} />
+                  <Route path="/community" element={<CommunityPage user={currentUser} posts={posts} setPosts={setPosts} setNotifications={setNotifications} />} />
                   <Route path="/post/:id" element={<PostDetailPage user={currentUser} posts={posts} setPosts={setPosts} />} />
-                  <Route path="/attendance" element={<AttendancePage user={currentUser} />} />
+                  <Route path="/attendance" element={<AttendancePage user={currentUser} attendanceRecords={attendanceRecords} setAttendanceRecords={setAttendanceRecords} />} />
                   <Route path="/qt" element={<QTPage user={currentUser} />} />
-                  <Route path="/admin" element={currentUser.role !== 'student' ? <AdminPage user={currentUser} notices={notices} setNotices={setNotices} schedules={schedules} setSchedules={setSchedules} verifiedUsers={verifiedUsers} setVerifiedUsers={setVerifiedUsers} worshipInfo={{time: "10:30", location: "지하 1층"}} setWorshipInfo={() => {}} /> : <Navigate to="/" />} />
+                  <Route path="/admin" element={canAccessAdmin ? <AdminPage user={currentUser} notices={notices} setNotices={setNotices} schedules={schedules} setSchedules={setSchedules} verifiedUsers={verifiedUsers} setVerifiedUsers={setVerifiedUsers} participations={participations} setParticipations={setParticipations} attendanceRecords={attendanceRecords} setAttendanceRecords={setAttendanceRecords} setNotifications={setNotifications} /> : <Navigate to="/" />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
@@ -166,7 +219,14 @@ const App: React.FC = () => {
               <NavLink to="/community" icon={<MessageSquare />} label="소통" />
               <NavLink to="/attendance" icon={<UserCheck />} label="출석" />
               <NavLink to="/qt" icon={<BookOpen />} label="묵상" />
-              {currentUser.role !== 'student' && <NavLink to="/admin" icon={<Settings />} label="관리" />}
+              {canAccessAdmin && (
+                <NavLink 
+                  to="/admin" 
+                  icon={<Settings />} 
+                  label="관리" 
+                  badge={participations.filter(p => !p.isRead).length > 0 ? participations.filter(p => !p.isRead).length : undefined} 
+                />
+              )}
             </nav>
           </>
         )}
@@ -175,15 +235,20 @@ const App: React.FC = () => {
   );
 };
 
-const NavLink = ({ to, icon, label }: { to: string, icon: React.ReactElement, label: string }) => {
+const NavLink = ({ to, icon, label, badge }: { to: string, icon: React.ReactElement, label: string, badge?: number }) => {
   const location = useLocation();
   const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
   return (
-    <Link to={to} className={`flex flex-col items-center space-y-1 transition-all active:scale-90 ${isActive ? 'text-indigo-600' : 'text-gray-300'}`}>
+    <Link to={to} className={`relative flex flex-col items-center space-y-1 transition-all active:scale-90 ${isActive ? 'text-indigo-600' : 'text-gray-300'}`}>
       <div className={`p-1.5 rounded-xl ${isActive ? 'bg-indigo-50' : ''}`}>
         {React.cloneElement(icon, { className: "w-6 h-6" } as any)}
       </div>
       <span className={`text-[10px] font-black ${isActive ? 'text-indigo-600' : 'text-gray-400'}`}>{label}</span>
+      {badge !== undefined && (
+        <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white animate-bounce">
+          {badge > 9 ? 'N' : badge}
+        </span>
+      )}
     </Link>
   );
 };

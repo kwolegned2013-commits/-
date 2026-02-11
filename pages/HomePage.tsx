@@ -32,6 +32,9 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
 
   const theme = getRoleTheme(user.role);
 
+  // 여름 수련회 공지 ID 찾기 (기본값 '1')
+  const retreatNotice = notices.find(n => n.title.includes('수련회')) || notices[0];
+
   return (
     <div className="space-y-6">
       {/* Identity Focused Greeting Area */}
@@ -67,9 +70,13 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
           
           <h1 className="text-2xl font-black mb-1 leading-tight">8월 여름 수련회<br/>"DEEP DIVE"</h1>
           <p className="opacity-80 text-xs mt-2 font-medium">함께 더 깊이 하나님을 만나는 시간!</p>
-          <button className="mt-6 bg-white text-indigo-600 px-6 py-3 rounded-2xl text-sm font-black shadow-lg active:scale-95 transition-all">
-            참가 신청하기
-          </button>
+          
+          <Link 
+            to={`/notice/${retreatNotice.id}`} 
+            className="mt-6 inline-block bg-white text-indigo-600 px-8 py-3.5 rounded-[18px] text-sm font-black shadow-lg active:scale-95 transition-all hover:bg-gray-50"
+          >
+            자세히 보기
+          </Link>
         </div>
         <div className="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-110 transition-transform duration-700 rotate-12">
           {user.role === 'leader' ? <Music className="w-48 h-48" /> : <Smile className="w-48 h-48" />}
@@ -100,7 +107,9 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
           <h2 className="text-xl font-black flex items-center tracking-tight">
             <Bell className="w-6 h-6 mr-2 text-indigo-600" /> 공지사항
           </h2>
-          <Link to="/" className="text-xs font-bold text-gray-400 flex items-center">전체보기 <ChevronRight className="w-4 h-4 ml-0.5" /></Link>
+          <Link to="/notices" className="text-xs font-bold text-indigo-600 flex items-center px-3 py-1.5 bg-indigo-50 rounded-full hover:bg-indigo-100 transition-colors">
+            전체보기 <ChevronRight className="w-4 h-4 ml-0.5" />
+          </Link>
         </div>
         <div className="space-y-3">
           {notices.slice(0, 2).map(notice => (
