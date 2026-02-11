@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { Home, MessageSquare, Calendar, UserCheck, Settings, BookOpen, Bell, LogOut, Sparkles } from 'lucide-react';
+import { Home, MessageSquare, Calendar, UserCheck, Settings, BookOpen, Bell, LogOut, Sparkles, Music } from 'lucide-react';
 import { User, Notice, Post } from './types';
 import { INITIAL_NOTICES, INITIAL_POSTS } from './constants';
 import HomePage from './pages/HomePage';
@@ -69,7 +69,6 @@ const App: React.FC = () => {
   const [schedules, setSchedules] = useState(getInitialSchedule);
 
   useEffect(() => {
-    // 1. 최우선적으로 HTML의 initial-loader 제거
     const initialLoader = document.getElementById('initial-loader');
     if (initialLoader) {
       initialLoader.style.opacity = '0';
@@ -78,7 +77,6 @@ const App: React.FC = () => {
       }, 400);
     }
 
-    // 2. 앱 내 SplashScreen 전환 로직
     const exitTimer = setTimeout(() => setIsSplashExiting(true), 1200);
     const removeTimer = setTimeout(() => setShowSplash(false), 1900);
     
@@ -101,10 +99,18 @@ const App: React.FC = () => {
     localStorage.removeItem('we_youth_user');
   };
 
-  const getRoleLabel = (role: string) => {
-    if (role === 'student') return '학생';
-    if (role === 'admin') return '전도사님';
+  const getRoleLabel = (user: User) => {
+    if (user.role === 'leader') return '찬양 리더';
+    if (user.role === 'student') return '학생';
+    if (user.role === 'admin') return '전도사님';
     return '선생님';
+  };
+
+  const getRoleColor = (role: string) => {
+    if (role === 'leader') return 'bg-violet-50 text-violet-600 border-violet-100';
+    if (role === 'admin') return 'bg-amber-50 text-amber-600 border-amber-100';
+    if (role === 'student') return 'bg-indigo-50 text-indigo-600 border-indigo-100';
+    return 'bg-emerald-50 text-emerald-600 border-emerald-100';
   };
 
   return (
@@ -125,11 +131,13 @@ const App: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <div className="hidden sm:block text-right">
                     <p className="text-sm font-black text-gray-900">
-                      안녕하세요, <span className="text-indigo-600">{currentUser.name} {getRoleLabel(currentUser.role)}</span>
+                      안녕하세요, <span className={currentUser.role === 'leader' ? 'text-violet-600' : 'text-indigo-600'}>
+                        {currentUser.name} {getRoleLabel(currentUser)}
+                      </span>
                     </p>
                   </div>
-                  <div className="sm:hidden text-xs font-black bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full border border-indigo-100">
-                    {currentUser.name} {getRoleLabel(currentUser.role)}
+                  <div className={`sm:hidden text-[10px] font-black px-3 py-1.5 rounded-full border ${getRoleColor(currentUser.role)}`}>
+                    {currentUser.name} {getRoleLabel(currentUser)}
                   </div>
                   <button onClick={handleLogout} className="p-2.5 text-gray-300 hover:text-red-500 active:bg-red-50 rounded-2xl transition-all">
                     <LogOut className="w-5 h-5" />

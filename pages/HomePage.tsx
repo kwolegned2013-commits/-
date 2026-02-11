@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { User, Notice } from '../types';
-import { Calendar, ChevronRight, Bell, Sparkles, MapPin, Clock, User as UserIcon } from 'lucide-react';
+import { Calendar, ChevronRight, Bell, Sparkles, MapPin, Clock, User as UserIcon, Music } from 'lucide-react';
 
 interface HomePageProps {
   user: User;
@@ -14,9 +14,15 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
   const latestNotice = notices[0];
 
   const getRoleLabel = (role: string) => {
+    if (role === 'leader') return '찬양 리더';
     if (role === 'student') return '학생';
     if (role === 'admin') return '전도사님';
     return '선생님';
+  };
+
+  const getRoleIcon = (role: string) => {
+    if (role === 'leader') return <Music className="w-4 h-4 text-violet-500" />;
+    return <UserIcon className="w-4 h-4" />;
   };
 
   return (
@@ -24,26 +30,31 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
       {/* Welcome Greeting Area */}
       <div className="px-1 animate-in fade-in slide-in-from-left duration-500">
         <div className="flex items-center space-x-2 text-indigo-600 mb-1">
-          <UserIcon className="w-4 h-4" />
-          <span className="text-sm font-black tracking-tight">
+          {getRoleIcon(user.role)}
+          <span className={`text-sm font-black tracking-tight ${user.role === 'leader' ? 'text-violet-600' : 'text-indigo-600'}`}>
             {user.name} {getRoleLabel(user.role)}
           </span>
         </div>
         <h2 className="text-2xl font-black text-gray-900 leading-tight">
-          반가워요! <span className="text-indigo-600">오늘의 소식</span>을 확인해보세요.
+          {user.role === 'leader' ? (
+            <>리더님, <span className="text-violet-600">오늘의 찬양팀 일정</span>을 확인하세요!</>
+          ) : (
+            <>반가워요! <span className="text-indigo-600">오늘의 소식</span>을 확인해보세요.</>
+          )}
         </h2>
       </div>
 
       {/* Event Highlight Banner */}
-      <section className="bg-indigo-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden group">
+      <section className={`rounded-3xl p-6 text-white shadow-xl relative overflow-hidden group ${user.role === 'leader' ? 'bg-gradient-to-br from-violet-600 to-indigo-700' : 'bg-indigo-600'}`}>
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">SPECIAL EVENT</span>
+              <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
+                {user.role === 'leader' ? 'WORSHIP LEADER' : 'SPECIAL EVENT'}
+              </span>
               <Sparkles className="w-4 h-4 text-amber-300" />
             </div>
-            {/* 배너 안에도 사용자 이름/역할 표시 (선택적 가독성 향상) */}
-            <span className="text-[10px] font-black opacity-60 italic">For. {user.name} {getRoleLabel(user.role)}</span>
+            <span className="text-[10px] font-black opacity-60 italic">For. {user.name}</span>
           </div>
           
           <h1 className="text-2xl font-black mb-1 leading-tight">8월 여름 수련회<br/>"DEEP DIVE"</h1>
@@ -53,7 +64,7 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
           </button>
         </div>
         <div className="absolute -bottom-6 -right-6 opacity-20 group-hover:scale-110 transition-transform duration-700">
-          <Calendar className="w-32 h-32" />
+          <Music className="w-32 h-32" />
         </div>
       </section>
 
@@ -113,7 +124,10 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
                 {item.day}
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-sm">{item.title}</h4>
+                <div className="flex items-center">
+                  <h4 className="font-bold text-sm">{item.title}</h4>
+                  {item.title.includes('찬양팀') && <Music className="w-3 h-3 ml-2 text-violet-400" />}
+                </div>
                 <p className="text-[11px] text-gray-400">{item.time}</p>
               </div>
             </div>
