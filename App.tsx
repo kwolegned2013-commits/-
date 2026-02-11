@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { Home, MessageSquare, Calendar, UserCheck, Settings, BookOpen, Bell, LogOut, Sparkles, Music } from 'lucide-react';
+import { Home, MessageSquare, Calendar, UserCheck, Settings, BookOpen, Bell, LogOut, Sparkles, Music, Users } from 'lucide-react';
 import { User, Notice, Post } from './types';
 import { INITIAL_NOTICES, INITIAL_POSTS } from './constants';
 import HomePage from './pages/HomePage';
@@ -32,7 +32,16 @@ const getInitialSchedule = () => {
   ];
 };
 
-// 요청하신 원래의 심플한 텍스트+스마일 로고 컴포넌트
+const getInitialVerifiedUsers = () => {
+  const saved = localStorage.getItem('we_youth_verified_users');
+  return saved ? JSON.parse(saved) : [
+    { name: '강은택', role: 'admin' },
+    { name: '김우신', role: 'admin' },
+    { name: '이승기', role: 'admin' },
+    { name: '오환희', role: 'leader' }
+  ];
+};
+
 export const Logo = ({ className = "", inverted = false }) => (
   <div className={`flex flex-col items-center leading-none ${className} ${inverted ? 'text-white' : 'text-gray-900'}`}>
     <div className="text-4xl font-black tracking-tighter flex items-center">
@@ -68,27 +77,22 @@ const App: React.FC = () => {
   const [notices, setNotices] = useState<Notice[]>(getInitialNotices);
   const [posts, setPosts] = useState<Post[]>(getInitialPosts);
   const [schedules, setSchedules] = useState(getInitialSchedule);
+  const [verifiedUsers, setVerifiedUsers] = useState<{name: string, role: string}[]>(getInitialVerifiedUsers);
 
   useEffect(() => {
     const initialLoader = document.getElementById('initial-loader');
     if (initialLoader) {
       initialLoader.style.opacity = '0';
-      setTimeout(() => {
-        if (initialLoader.parentNode) initialLoader.remove();
-      }, 400);
+      setTimeout(() => { if (initialLoader.parentNode) initialLoader.remove(); }, 400);
     }
-
     const exitTimer = setTimeout(() => setIsSplashExiting(true), 1200);
     const removeTimer = setTimeout(() => setShowSplash(false), 1900);
-    
-    return () => {
-      clearTimeout(exitTimer);
-      clearTimeout(removeTimer);
-    };
+    return () => { clearTimeout(exitTimer); clearTimeout(removeTimer); };
   }, []);
 
   useEffect(() => { localStorage.setItem('we_youth_notices', JSON.stringify(notices)); }, [notices]);
   useEffect(() => { localStorage.setItem('we_youth_posts', JSON.stringify(posts)); }, [posts]);
+  useEffect(() => { localStorage.setItem('we_youth_verified_users', JSON.stringify(verifiedUsers)); }, [verifiedUsers]);
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
@@ -104,6 +108,7 @@ const App: React.FC = () => {
     if (role === 'leader') return '찬양 리더';
     if (role === 'student') return '학생';
     if (role === 'admin') return '전도사님';
+    if (role === 'president') return '회장님';
     return '선생님';
   };
 
@@ -111,6 +116,7 @@ const App: React.FC = () => {
     if (role === 'leader') return 'bg-violet-600 text-white ring-4 ring-violet-100';
     if (role === 'admin') return 'bg-amber-500 text-white ring-4 ring-amber-100';
     if (role === 'student') return 'bg-indigo-600 text-white ring-4 ring-indigo-100';
+    if (role === 'president') return 'bg-rose-500 text-white ring-4 ring-rose-100';
     return 'bg-emerald-600 text-white ring-4 ring-emerald-100';
   };
 
@@ -119,7 +125,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex flex-col overflow-x-hidden pb-24">
         {showSplash && <SplashScreen isExiting={isSplashExiting} />}
         
-        {!showSplash && !currentUser && <LoginPage onLogin={handleLogin} />}
+        {!showSplash && !currentUser && <LoginPage onLogin={handleLogin} verifiedUsers={verifiedUsers} />}
 
         {!showSplash && currentUser && (
           <>
@@ -149,7 +155,7 @@ const App: React.FC = () => {
                   <Route path="/post/:id" element={<PostDetailPage user={currentUser} posts={posts} setPosts={setPosts} />} />
                   <Route path="/attendance" element={<AttendancePage user={currentUser} />} />
                   <Route path="/qt" element={<QTPage user={currentUser} />} />
-                  <Route path="/admin" element={currentUser.role !== 'student' ? <AdminPage user={currentUser} notices={notices} setNotices={setNotices} schedules={schedules} setSchedules={setSchedules} worshipInfo={{time: "10:30", location: "지하 1층"}} setWorshipInfo={() => {}} /> : <Navigate to="/" />} />
+                  <Route path="/admin" element={currentUser.role !== 'student' ? <AdminPage user={currentUser} notices={notices} setNotices={setNotices} schedules={schedules} setSchedules={setSchedules} verifiedUsers={verifiedUsers} setVerifiedUsers={setVerifiedUsers} worshipInfo={{time: "10:30", location: "지하 1층"}} setWorshipInfo={() => {}} /> : <Navigate to="/" />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>

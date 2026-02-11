@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { User, Notice } from '../types';
-import { Calendar, ChevronRight, Bell, Sparkles, MapPin, Clock, Smile, User as UserIcon, Music, ShieldCheck } from 'lucide-react';
+import { Calendar, ChevronRight, Bell, Sparkles, MapPin, Clock, Smile, User as UserIcon, Music, ShieldCheck, Star } from 'lucide-react';
 
 interface HomePageProps {
   user: User;
@@ -11,12 +11,11 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
-  const latestNotice = notices[0];
-
   const getRoleLabel = (role: string) => {
     if (role === 'leader') return '찬양 리더';
     if (role === 'student') return '청소년 학생';
     if (role === 'admin') return '전도사님';
+    if (role === 'president') return '우리들의 회장님';
     return '선생님';
   };
 
@@ -26,6 +25,7 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
       case 'teacher': return { icon: <UserIcon className="w-5 h-5" />, color: 'text-emerald-600', bg: 'bg-emerald-50' };
       case 'leader': return { icon: <Music className="w-5 h-5" />, color: 'text-violet-600', bg: 'bg-violet-50' };
       case 'admin': return { icon: <ShieldCheck className="w-5 h-5" />, color: 'text-amber-600', bg: 'bg-amber-50' };
+      case 'president': return { icon: <Star className="w-5 h-5 fill-current" />, color: 'text-rose-500', bg: 'bg-rose-50' };
       default: return { icon: <UserIcon className="w-5 h-5" />, color: 'text-gray-600', bg: 'bg-gray-50' };
     }
   };
@@ -43,7 +43,7 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
           </span>
         </div>
         <h2 className="text-3xl font-black text-gray-900 leading-tight">
-          <span className={theme.color}>{user.name} {user.role === 'student' ? '학생님' : ''}</span>,
+          <span className={theme.color}>{user.name} {user.role === 'student' || user.role === 'president' ? '님' : ''}</span>,
           <br />오늘도 만나서 반가워요!
         </h2>
       </div>
@@ -52,6 +52,7 @@ const HomePage: React.FC<HomePageProps> = ({ user, notices, schedules }) => {
       <section className={`rounded-[32px] p-8 text-white shadow-xl relative overflow-hidden group ${
         user.role === 'leader' ? 'bg-gradient-to-br from-violet-600 to-indigo-700' : 
         user.role === 'admin' ? 'bg-gradient-to-br from-amber-500 to-orange-600' :
+        user.role === 'president' ? 'bg-gradient-to-br from-rose-500 to-pink-600' :
         'bg-indigo-600'
       }`}>
         <div className="relative z-10">

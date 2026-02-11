@@ -1,23 +1,23 @@
 
 import React, { useState } from 'react';
 import { User } from '../types';
-import { Smile, ShieldCheck, User as UserIcon, Lock, Sparkles, AlertCircle } from 'lucide-react';
+import { Smile, ShieldCheck, User as UserIcon, Lock, Sparkles, AlertCircle, UserCheck } from 'lucide-react';
+import { Logo } from '../App';
 
 interface LoginPageProps {
   onLogin: (user: User) => void;
+  verifiedUsers: {name: string, role: string}[];
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ onLogin, verifiedUsers }) => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [nameError, setNameError] = useState('');
   const [passError, setPassError] = useState('');
 
   const REQUIRED_PASSWORD = '12345678';
-  const MASTER_NAMES = ['강은택', '김우신', '이승기'];
-  const SPECIAL_TEACHER_NAMES = ['오환희'];
 
-  const handleLogin = (selectedRole: 'student' | 'teacher') => {
+  const handleLogin = (intendedRole: 'student' | 'teacher') => {
     let hasError = false;
     const trimmedName = userName.trim();
 
@@ -30,59 +30,44 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
     if (hasError) return;
 
-    if (MASTER_NAMES.includes(trimmedName)) {
-      onLogin({
-        id: `admin_${Date.now()}`,
-        name: trimmedName,
-        role: 'admin'
-      });
-      return;
-    }
-
-    if (SPECIAL_TEACHER_NAMES.includes(trimmedName)) {
-      onLogin({
-        id: `teacher_${Date.now()}`,
-        name: trimmedName,
-        role: 'teacher'
-      });
-      return;
-    }
-
+    // 관리자가 설정한 명단 대조
+    const verifiedUser = verifiedUsers.find(u => u.name === trimmedName);
+    
+    // 공용 비밀번호 체크
     if (password !== REQUIRED_PASSWORD) {
       setPassError('비밀번호가 틀렸습니다 (12345678)');
       return;
-    } else {
-      setPassError('');
     }
-    
-    const mockUser: User = {
-      id: `${selectedRole[0]}_${Date.now()}`,
+
+    // 명단에 있는 경우 관리자가 설정한 역할(신분)을 우선 적용하여 로그인
+    if (verifiedUser) {
+      onLogin({
+        id: `${verifiedUser.role[0]}_${Date.now()}`,
+        name: trimmedName,
+        role: verifiedUser.role as any
+      });
+      return;
+    }
+
+    // 명단에 없는 경우 사용자가 선택한 버튼의 신분으로 로그인
+    onLogin({
+      id: `${intendedRole[0]}_${Date.now()}`,
       name: trimmedName,
-      role: selectedRole,
-      grade: selectedRole === 'student' ? 10 : undefined
-    };
-    
-    onLogin(mockUser);
+      role: intendedRole,
+      grade: intendedRole === 'student' ? 10 : undefined
+    });
   };
 
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-indigo-600/20 blur-[100px] rounded-full"></div>
       
-      <div className="mb-10 flex flex-col items-center animate-in fade-in zoom-in duration-700 relative z-10">
-        <div className="flex flex-col items-center leading-none text-white mb-6">
-          <div className="font-black text-7xl tracking-tighter flex items-center">
-            <span>WE</span>
-          </div>
-          <div className="w-full flex justify-center -mt-2">
-             <svg width="70" height="20" viewBox="0 0 24 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-               <path d="M2 2C6 6 18 6 22 2" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-             </svg>
-          </div>
-        </div>
+      <div className="mb-10 flex flex-col items-center animate-in fade-in zoom-in duration-700 relative z-10 text-center">
+        <Logo inverted className="mb-8 scale-110" />
         <h1 className="text-2xl font-black text-white tracking-tight">우리는 청소년부</h1>
-        <p className="text-gray-400 text-sm mt-2 font-medium opacity-80">함께 웃고 성장하는 우리들의 공간</p>
+        <p className="text-gray-400 text-sm mt-2 font-medium opacity-80 leading-relaxed">
+          관리자가 등록한 이름으로 로그인하면<br/>자동으로 신분이 확인됩니다.
+        </p>
       </div>
 
       <div className="w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl space-y-6 relative z-10 border border-white/10">
@@ -97,7 +82,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               <input 
                 type="text" 
                 placeholder="성함을 입력하세요"
-                className={`w-full bg-gray-50 border ${nameError ? 'border-red-300 ring-1 ring-red-100' : 'border-gray-100'} rounded-2xl py-4 pl-12 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                className={`w-full bg-gray-50 border ${nameError ? 'border-red-300 ring-1 ring-red-100' : 'border-gray-100'} rounded-2xl py-4 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-indigo-500 transition-all outline-none`}
                 value={userName}
                 onChange={(e) => {
                   setUserName(e.target.value);
@@ -105,11 +90,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 }}
               />
             </div>
-            {nameError && (
-              <p className="text-[11px] text-red-500 font-bold ml-2 animate-pulse flex items-center">
-                <AlertCircle className="w-3 h-3 mr-1" /> {nameError}
-              </p>
-            )}
+            {nameError && <p className="text-[11px] text-red-500 font-bold ml-2 animate-pulse flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> {nameError}</p>}
           </div>
 
           <div className="space-y-1">
@@ -118,7 +99,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               <input 
                 type="password" 
                 placeholder="비밀번호 (12345678)"
-                className={`w-full bg-gray-50 border ${passError ? 'border-red-300 ring-1 ring-red-100' : 'border-gray-100'} rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                className={`w-full bg-gray-50 border ${passError ? 'border-red-300 ring-1 ring-red-100' : 'border-gray-100'} rounded-2xl py-4 pl-12 pr-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none`}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -126,9 +107,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 }}
               />
             </div>
-            {passError && (
-              <p className="text-[11px] text-red-500 font-bold ml-2 animate-pulse">{passError}</p>
-            )}
+            {passError && <p className="text-[11px] text-red-500 font-bold ml-2 animate-pulse">{passError}</p>}
           </div>
         </div>
 
@@ -154,7 +133,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       <div className="mt-8 flex flex-col items-center space-y-4 text-center">
         <div className="bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">
           <p className="text-[10px] text-gray-400 font-medium italic flex items-center">
-            <Sparkles className="w-3 h-3 mr-2 text-amber-500" /> Authorized Access Only
+            <UserCheck className="w-3 h-3 mr-2 text-indigo-400" /> 명단에 없어도 버튼을 선택해 로그인할 수 있습니다.
           </p>
         </div>
       </div>
