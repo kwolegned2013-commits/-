@@ -13,7 +13,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#111827">
     
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/svg?seed=we-youth&backgroundColor=4f46e5">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,6 +32,7 @@
           user-select: none;
           overscroll-behavior-y: contain;
           background-color: #f9fafb;
+          padding-top: env(safe-area-inset-top);
           padding-bottom: env(safe-area-inset-bottom);
           margin: 0;
         }
