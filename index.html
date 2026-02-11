@@ -51,12 +51,16 @@
           z-index: 9999;
           transition: opacity 0.4s ease-out;
         }
-        .loader-logo {
+        .loader-logo-svg {
+          width: 80px;
+          height: 80px;
           color: white;
-          font-size: 3rem;
-          font-weight: 900;
-          letter-spacing: -0.05em;
-          margin-bottom: 1rem;
+          margin-bottom: 1.5rem;
+          animation: logoScale 2s infinite ease-in-out;
+        }
+        @keyframes logoScale {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.1); opacity: 1; }
         }
         .loader-bar {
           width: 40px;
@@ -98,7 +102,13 @@
     <div id="root"></div>
     <!-- 자바스크립트 로드 전에 보여질 화면 -->
     <div id="initial-loader">
-        <div class="loader-logo">WE</div>
+        <svg class="loader-logo-svg" viewBox="0 0 100 100" fill="currentColor">
+          <path d="M15 35 Q20 30 25 35 L35 70 L45 35 Q50 30 55 35 L65 70 L75 35 Q80 30 85 35" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M45 45 H75 M45 55 H70 M45 65 H75 M45 45 V65" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="transform: translateX(4px); opacity: 0.9;" />
+          <path d="M25 80 Q50 95 75 80" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+          <circle cx="25" cy="80" r="2.5" />
+          <circle cx="75" cy="80" r="2.5" />
+        </svg>
         <div class="loader-bar"></div>
     </div>
     <script type="module" src="./index.tsx"></script>

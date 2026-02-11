@@ -32,22 +32,28 @@ const getInitialSchedule = () => {
   ];
 };
 
+// 제공된 이미지의 스타일을 반영한 SVG 로고
 const Logo = ({ className = "", inverted = false }) => (
-  <div className={`flex flex-col items-center leading-none ${className} ${inverted ? 'text-white' : 'text-gray-900'}`}>
-    <div className="text-3xl font-black tracking-tighter flex items-center">
-      <span>WE</span>
-    </div>
-    <div className="w-full flex justify-center -mt-1">
-       <svg width="28" height="8" viewBox="0 0 24 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-         <path d="M2 2C6 6 18 6 22 2" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-       </svg>
-    </div>
+  <div className={`relative flex flex-col items-center justify-center ${className} ${inverted ? 'text-white' : 'text-gray-900'}`}>
+    <svg viewBox="0 0 100 100" className="w-full h-full" fill="currentColor">
+      {/* Stylized 'W' (Brush style) */}
+      <path d="M15 35 Q20 30 25 35 L35 70 L45 35 Q50 30 55 35 L65 70 L75 35 Q80 30 85 35" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Stylized 'E' (Brush style) */}
+      <path d="M45 45 H75 M45 55 H70 M45 65 H75 M45 45 V65" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" className="translate-x-4 opacity-90" />
+      {/* Smile Arc */}
+      <path d="M25 80 Q50 95 75 80" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+      <circle cx="25" cy="80" r="2.5" />
+      <circle cx="75" cy="80" r="2.5" />
+    </svg>
   </div>
 );
 
 const SplashScreen = ({ isExiting }: { isExiting: boolean }) => (
   <div className={`fixed inset-0 bg-gray-950 flex flex-col items-center justify-center z-[999] transition-opacity duration-700 ${isExiting ? 'opacity-0' : 'opacity-100'}`}>
-    <Logo inverted className="mb-6 scale-125" />
+    <div className="relative">
+      <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full scale-150 animate-pulse"></div>
+      <Logo inverted className="w-32 h-32 mb-8 relative z-10" />
+    </div>
     <div className="flex items-center space-x-2 text-indigo-400 font-bold tracking-widest text-sm animate-pulse">
       <Sparkles className="w-4 h-4" />
       <span>WE YOUTH</span>
@@ -125,7 +131,7 @@ const App: React.FC = () => {
             <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-4 pt-safe shadow-sm">
               <div className="max-w-4xl mx-auto h-16 flex items-center justify-between">
                 <Link to="/" className="flex items-center space-x-2 active:scale-95 transition-transform">
-                  <Logo className="scale-75" />
+                  <Logo className="w-10 h-10" />
                   <span className="font-black text-xl tracking-tighter text-gray-900 ml-1">우리는 청소년부</span>
                 </Link>
                 <div className="flex items-center space-x-3">

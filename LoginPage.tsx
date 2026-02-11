@@ -7,6 +7,19 @@ interface LoginPageProps {
   onLogin: (user: User) => void;
 }
 
+// 로고 컴포넌트 (동일 디자인 유지)
+const Logo = ({ className = "" }) => (
+  <div className={`relative flex flex-col items-center justify-center ${className} text-white`}>
+    <svg viewBox="0 0 100 100" className="w-full h-full" fill="currentColor">
+      <path d="M15 35 Q20 30 25 35 L35 70 L45 35 Q50 30 55 35 L65 70 L75 35 Q80 30 85 35" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M45 45 H75 M45 55 H70 M45 65 H75 M45 45 V65" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" className="translate-x-4 opacity-90" />
+      <path d="M25 80 Q50 95 75 80" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+      <circle cx="25" cy="80" r="2.5" />
+      <circle cx="75" cy="80" r="2.5" />
+    </svg>
+  </div>
+);
+
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -58,6 +71,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       setPassError('');
     }
     
+    // 버튼 클릭에 따른 역할 부여 (요청하신 대로 학생 누르면 학생, 선생님 누르면 선생님)
     const mockUser: User = {
       id: `${selectedRole[0]}_${Date.now()}`,
       name: trimmedName,
@@ -73,16 +87,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-indigo-600/20 blur-[100px] rounded-full"></div>
       
       <div className="mb-10 flex flex-col items-center animate-in fade-in zoom-in duration-700 relative z-10">
-        <div className="flex flex-col items-center leading-none text-white mb-6">
-          <div className="font-black text-7xl tracking-tighter flex items-center">
-            <span>WE</span>
-          </div>
-          <div className="w-full flex justify-center -mt-2">
-             <svg width="70" height="20" viewBox="0 0 24 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-               <path d="M2 2C6 6 18 6 22 2" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-             </svg>
-          </div>
-        </div>
+        <Logo className="w-24 h-24 mb-4" />
         <h1 className="text-2xl font-black text-white tracking-tight">우리는 청소년부</h1>
         <p className="text-gray-400 text-sm mt-2 font-medium opacity-80">함께 웃고 성장하는 우리들의 공간</p>
       </div>
